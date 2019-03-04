@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">    
+</head>
+<body>
+<div class="container">
+ <br>
+ <div class="jumbotron">
+ <h1 class="display-4">Send Message</h1>
+ <br>
+ <input id = "name" class="form-control" placeholder="Name">
+ <br>
+ <textarea id = "message" class="form-control" placeholder="Your Message Here">
+</textarea>
+ <br>
+ <button id="send" class="btn btn-success">Send</button>
+ </div>
+ <div id="messages">
+</div>
+</div>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js" ></script>
+<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+<script>
+$(() => {
+    $("#send").click(()=>{
+      console.log('here');
+       sendMessage({
+          name: $("#name").val(), 
+          message:$("#message").val()});
+        })
+        getMessages()
+    })
+    
+function addMessages(message){
+   $("#messages").append(`
+      <h4> ${message.name} </h4>
+      <p>  ${message.message} </p>`)
+   }
+   
+function getMessages(){
+  $.get('http://127.0.0.1:3000/messages', (data) => {
+    data.forEach(addMessages);
+    })
+}
+function sendMessage(message){
+  $.post('http://127.0.0.1:3000/messages', message)
+
+}
+var socket = io();
+socket.on('message', addMessages)
+</script>
+</body>
+</html>
