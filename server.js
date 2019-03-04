@@ -4,7 +4,9 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var mongoose = require('mongoose');
-app.use(express.static(__dirname));
+const PORT = process.env.PORT || 3000;
+//app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'frontend/build')))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}))
 
@@ -40,12 +42,16 @@ app.post('/messages', (req, res) => {
     res.sendStatus(200);
   })
 })
+app.get('*', (req, res) => {
+res.sendFile(path.join(__dirname + '/frontend/build/index.html'))
+});
+
 io.on('connection', () =>{
   console.log('a user is connected')
 })
 mongoose.connect(dbUrl ,{useMongoClient : true} ,(err) => {
   console.log('mongodb connected',err);
 })
-var server = http.listen(3000, () => {
+var server = http.listen(PORT, () => {
   console.log('server is running on port', server.address().port);
 });
