@@ -4,6 +4,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var mongoose = require('mongoose');
+const PORT = process.env.PORT || 3000;
 app.use(express.static(__dirname));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}))
@@ -46,6 +47,6 @@ io.on('connection', () =>{
 mongoose.connect(dbUrl ,{useMongoClient : true} ,(err) => {
   console.log('mongodb connected',err);
 })
-var server = http.listen(3000, () => {
+var server = http.listen(PORT, () => {
   console.log('server is running on port', server.address().port);
 });
