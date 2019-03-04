@@ -5,7 +5,8 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var mongoose = require('mongoose');
 const PORT = process.env.PORT || 3000;
-app.use(express.static(__dirname));
+//app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'frontend/build')))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}))
 
@@ -41,6 +42,10 @@ app.post('/messages', (req, res) => {
     res.sendStatus(200);
   })
 })
+app.get('*', (req, res) => {
+res.sendFile(path.join(__dirname + '/frontend/build/index.html'))
+});
+
 io.on('connection', () =>{
   console.log('a user is connected')
 })
