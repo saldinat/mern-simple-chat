@@ -25,12 +25,13 @@
 <script>
 $(() => {
     $("#send").click(()=>{
-      console.log('here');
        sendMessage({
           name: $("#name").val(), 
           message:$("#message").val()});
         })
         getMessages()
+        $("#name").val('');
+        $("#message").val('');
     })
     
 function addMessages(message){
