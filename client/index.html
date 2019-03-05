@@ -32,9 +32,7 @@ $(() => {
           $("#message").val('');
         })
         getMessages()
-        
     })
-    
 function addMessages(message){
    $("#messages").append(`
       <h4> ${message.name} </h4>
@@ -52,6 +50,8 @@ function sendMessage(message){
 }
 var socket = io();
 socket.on('message', addMessages)
+var clients = io.sockets.clients();
+console.log(clients);
 </script>
 </body>
 </html>
