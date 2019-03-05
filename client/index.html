@@ -28,10 +28,11 @@ $(() => {
        sendMessage({
           name: $("#name").val(), 
           message:$("#message").val()});
+          $("#name").val('');
+          $("#message").val('');
         })
         getMessages()
-        $("#name").val('');
-        $("#message").val('');
+        
     })
     
 function addMessages(message){
