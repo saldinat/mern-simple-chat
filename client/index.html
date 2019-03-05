@@ -50,7 +50,7 @@ function sendMessage(message){
 }
 var socket = io();
 socket.on('message', addMessages)
-var clients = socket.sockets.clients();
+var clients = findClientsSocket();
 console.log(clients);
 </script>
 </body>
