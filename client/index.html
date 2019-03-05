@@ -40,12 +40,12 @@ function addMessages(message){
    }
    
 function getMessages(){
-  $.get('http://127.0.0.1:3000/messages', (data) => {
+  $.get('https://mern-simple-chat.herokuapp.com/messages', (data) => {
     data.forEach(addMessages);
     })
 }
 function sendMessage(message){
-  $.post('http://127.0.0.1:3000/messages', message)
+  $.post('https://mern-simple-chat.herokuapp.com/messages', message)
 
 }
 var socket = io();
