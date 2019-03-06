@@ -34,10 +34,8 @@ io.on('connection', (socket) =>{
   // node
   socket.on("nRoom", function(room){
       socket.join(room);
-      console.log('HANDSHAKE => ' + handshake['time']);
       socket.emit("node new user", users[socket.id] + " you joined room "+room+ " at " + handshake['time']);
-      socket.broadcast.in(room).emit("node new user", users[socket.id] + " new user has joined");
-      
+      socket.broadcast.in(room).emit("node new user", users[socket.id] + " new user has joined");   
   });
   
   socket.on("node new message", function(data){
@@ -51,18 +49,25 @@ io.on('connection', (socket) =>{
   });
   // python
   socket.on("pRoom", function(room){
-      socket.join(room);
-      socket.broadcast.in(room).emit("python new user", users[socket.id] + " new user has joined");
-  });
+    socket.join(room);
+    socket.emit("python new user", users[socket.id] + " you joined room "+room+ " at " + handshake['time']);
+    socket.broadcast.in(room).emit("python new user", users[socket.id] + " new user has joined");   
+});
 
-  socket.on("python new message", function(data){
-      io.sockets.in("pRoom").emit('python news', users[socket.id] + ": "+ data);
-  });
+socket.on("python new message", function(data){
+    io.sockets.in("pRoom").emit('python news', users[socket.id] + ": "+ data);
+});
+socket.on("python leave room", function(data){
+  socket.broadcast.in("pRoom").emit('python news', users[socket.id] + " left ");
+  socket.emit("python news", users[socket.id] + " you left this room at " + handshake['time']);
+
+  socket.leave("pRoom");
+});
   //disconnect
   socket.on('disconnect', function () {
     io.emit('user disconnected');
     socket.broadcast.in("nRoom").emit('node news', users[socket.id] + " left ");
-
+    socket.broadcast.in("pRoom").emit('node news', users[socket.id] + " left ");
   });
 })
 

@@ -6,7 +6,9 @@
 <body>
     <div class="outer">
         <div class="room">
-            <h1>NODE</h1>
+            <h1>NODE room</h1>
+            <button type="button" value="Join" id="n_joinBtn" class="btn btn-primary">Join</button>
+
             <div class="messages" id="nMessages"></div>
             <form>
                 <input type="text" name="" id="nTxt" class="txt-send">
@@ -16,7 +18,8 @@
             </form>
         </div>
         <div class="room">
-            <h1>PYTHON</h1>
+            <h1>PYTHON room</h1>
+            <button type="button" value="Join" id="p_joinBtn" class="btn btn-primary">Join</button>
             <div class="messages" id="pMessages"></div>
             <form>
                 <input type="text" name="" id="pTxt" class="txt-send">
@@ -30,60 +33,22 @@
 
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js" ></script>
 <script src="https://mern-simple-chat.herokuapp.com/socket.io/socket.io.js"></script> 
-
-
 <script>
-$(() => {
-    $("#join_room_1").click(()=>{
-        console.log(socket.id)
-        socket.emit('room', socket.id);
-       $("#messages").append("joined room 1");
-       socket.emit('room', 1111);
-       
-       $("#messages").append(socket);
-    })
-
-    $("#send").click(()=>{
-       sendMessage({
-          name: $("#name").val(), 
-          message:$("#message").val()});
-          $("#name").val('');
-          $("#message").val('');
-        })
-        getMessages()
-    })
-function addMessages(message){
-   $("#messages").append(`
-      <h4> ${message.name} </h4>
-      <p>  ${message.message} </p>`)
-   }
-   
-function getMessages(){
-  $.get('127.0.0.1:3000/messages', (data) => {
-    data.forEach(addMessages);
-    })
-}
-function sendMessage(message){
-  $.post('127.0.0.1:3000/messages', message)
-}
-
-
-
-
 var socket = io();
 socket.on("connect", function(){
             var nRoom = "nRoom";
-            socket.emit('nRoom', nRoom);
-            storeUser({
-                name: socket.id, 
-                room: nRoom
-            });
-            var pRoom = "pRoom";
-            socket.emit("pRoom", pRoom);
+            //socket.emit('nRoom', nRoom);
+            // storeUser({
+            //     name: socket.id, 
+            //     room: nRoom
+            // });
+            //var pRoom = "pRoom";
+            //socket.emit("pRoom", pRoom);
         });
         // NODE
         var nBtn = document.getElementById("nBtn");
         var n_leaveBtn = document.getElementById("n_leaveBtn");
+        var n_joinBtn = document.getElementById("n_joinBtn");
         var nTxt = document.getElementById("nTxt");
         var nMessages = document.getElementById("nMessages");
         
@@ -92,6 +57,14 @@ socket.on("connect", function(){
         });
         n_leaveBtn.addEventListener("click", function(){
             socket.emit("node leave room");
+        });
+        n_joinBtn.addEventListener("click", function(){
+            var nRoom = "nRoom";
+            socket.emit('nRoom', nRoom);
+            storeUser({
+                name: socket.id, 
+                room: nRoom
+            });
         });
         socket.on("node news", function(data){
             nMessages.innerHTML = nMessages.innerHTML + "<br>" + data;
@@ -105,6 +78,17 @@ socket.on("connect", function(){
         var pMessages = document.getElementById("pMessages");
         pBtn.addEventListener("click", function(){
             socket.emit("python new message", pTxt.value);
+        });
+        p_leaveBtn.addEventListener("click", function(){
+            socket.emit("python leave room");
+        });
+        p_joinBtn.addEventListener("click", function(){
+            var pRoom = "pRoom";
+            socket.emit('pRoom', pRoom);
+            storeUser({
+                name: socket.id, 
+                room: pRoom
+            });
         });
         socket.on("python news", function(data){
             pMessages.innerHTML = pMessages.innerHTML + "<br>" + data;
