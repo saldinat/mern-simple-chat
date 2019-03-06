@@ -78,6 +78,8 @@ mongoose.connect(dbUrl ,{useMongoClient : true} ,(err) => {
 var server = http.listen(PORT, () => {
   console.log('server is running on port', server.address().port);
 });
+
+
 app.get('/users', (req, res) => {
   console.log('in /users');
   User.find({},(err, messages)=> {
@@ -95,13 +97,19 @@ app.post('/users', (req, res) => {
   })
 })
 
-app.get('/:name', function(req, res){
+app.get('/rooms/:name', function(req, res){
   name = req.params.name;
-  res.sendFile(path.join(__dirname, "/client/index.html"));
+  //console.log(name);
+  res.sendFile(path.join(__dirname, "/client/rooms.html"));
 });
-
+// app.post('/rooms', function(req, res){
+//   console.dir(req.body.name)
+//   name = req.body.name;
+//   //console.log(name);
+//   res.redirect(307, "/client/rooms/"+name);
+// });
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname + '/client/index.html'))
-  });
+});
 
