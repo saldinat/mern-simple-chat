@@ -4,26 +4,45 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">    
 </head>
 <body>
-<div class="container">
- <br>
- <div class="jumbotron">
- <h1 class="display-4">Send Message</h1>
- <br>
- <input id = "name" class="form-control" placeholder="Name">
- <br>
- <textarea id = "message" class="form-control" placeholder="Your Message Here">
-</textarea>
- <br>
- <button id="send" class="btn btn-success">Send</button>
- </div>
- <div id="messages">
-</div>
+    <div class="outer">
+        <div class="room">
+            <h1>NODE</h1>
+            <div class="messages" id="nMessages"></div>
+            <form>
+                <input type="text" name="" id="nTxt" class="txt-send">
+                <input type="button" value="Send" id="nBtn" class="btn">
+                <input type="button" value="Leave" id="n_leaveBtn" class="btn">
+
+            </form>
+        </div>
+        <div class="room">
+            <h1>PYTHON</h1>
+            <div class="messages" id="pMessages"></div>
+            <form>
+                <input type="text" name="" id="pTxt" class="txt-send">
+                <input type="button" value="Send" id="pBtn" class="btn">
+                <input type="button" value="Leave" id="p_leaveBtn" class="btn">
+
+            </form>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js" ></script>
-<script src="https://mern-simple-chat.herokuapp.com/socket.io/socket.io.js"></script>
+<script src="https://mern-simple-chat.herokuapp.com/socket.io/socket.io.js"></script> 
+
+
 <script>
 $(() => {
+    $("#join_room_1").click(()=>{
+        console.log(socket.id)
+        socket.emit('room', socket.id);
+       $("#messages").append("joined room 1");
+       socket.emit('room', 1111);
+       
+       $("#messages").append(socket);
+    })
+
     $("#send").click(()=>{
        sendMessage({
           name: $("#name").val(), 
@@ -40,18 +59,64 @@ function addMessages(message){
    }
    
 function getMessages(){
-  $.get('https://mern-simple-chat.herokuapp.com/messages', (data) => {
+  $.get('127.0.0.1:3000/messages', (data) => {
     data.forEach(addMessages);
     })
 }
 function sendMessage(message){
-  $.post('https://mern-simple-chat.herokuapp.com/messages', message)
-
+  $.post('127.0.0.1:3000/messages', message)
 }
+
+
+
+
 var socket = io();
-socket.on('message', addMessages)
-var clients = findClientsSocket();
-console.log(clients);
+socket.on("connect", function(){
+            var nRoom = "nRoom";
+            socket.emit('nRoom', nRoom);
+            storeUser({
+                name: socket.id, 
+                room: nRoom
+            });
+            var pRoom = "pRoom";
+            socket.emit("pRoom", pRoom);
+        });
+        // NODE
+        var nBtn = document.getElementById("nBtn");
+        var n_leaveBtn = document.getElementById("n_leaveBtn");
+        var nTxt = document.getElementById("nTxt");
+        var nMessages = document.getElementById("nMessages");
+        
+        nBtn.addEventListener("click", function(){
+            socket.emit("node new message", nTxt.value);
+        });
+        n_leaveBtn.addEventListener("click", function(){
+            socket.emit("node leave room");
+        });
+        socket.on("node news", function(data){
+            nMessages.innerHTML = nMessages.innerHTML + "<br>" + data;
+        });
+        socket.on("node new user", function(data){
+            nMessages.innerHTML = nMessages.innerHTML + "<br>" + data;
+        });
+        // Python
+        var pBtn = document.getElementById("pBtn");
+        var pTxt = document.getElementById("pTxt");
+        var pMessages = document.getElementById("pMessages");
+        pBtn.addEventListener("click", function(){
+            socket.emit("python new message", pTxt.value);
+        });
+        socket.on("python news", function(data){
+            pMessages.innerHTML = pMessages.innerHTML + "<br>" + data;
+        });
+        socket.on("python new user", function(data){
+            pMessages.innerHTML = pMessages.innerHTML + "<br>" + data;
+        });
+
+        function storeUser(user){
+            $.post('/users', user);
+        }
+
 </script>
 </body>
 </html>
