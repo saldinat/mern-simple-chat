@@ -6,26 +6,23 @@
 <body>
     <div class="outer">
         <div class="room">
-            <h1>NODE room</h1>
+            <h1>NODE room <a class="btn btn-info" href="/api/nRoom">see the log</a></h1>
             <button type="button" value="Join" id="n_joinBtn" class="btn btn-primary">Join</button>
-
             <div class="messages" id="nMessages"></div>
             <form>
                 <input type="text" name="" id="nTxt" class="txt-send">
                 <input type="button" value="Send" id="nBtn" class="btn">
-                <input type="button" value="Leave" id="n_leaveBtn" class="btn">
-
+                <button  type="button" value="Leave" id="n_leaveBtn" class="btn btn-danger">Leave room</button>
             </form>
         </div>
         <div class="room">
-            <h1>PYTHON room</h1>
+            <h1>PYTHON room <a class="btn btn-info" href="/api/pRoom">see the log</a></h1>
             <button type="button" value="Join" id="p_joinBtn" class="btn btn-primary">Join</button>
             <div class="messages" id="pMessages"></div>
             <form>
                 <input type="text" name="" id="pTxt" class="txt-send">
-                <input type="button" value="Send" id="pBtn" class="btn">
-                <input type="button" value="Leave" id="p_leaveBtn" class="btn">
-
+                <button type="button" value="Send" id="pBtn" class="btn btn-default">Send</button>
+                <button type="button" value="Leave" id="p_leaveBtn" class="btn btn-danger">Leave room</button>
             </form>
         </div>
     </div>
@@ -36,16 +33,9 @@
 <script>
 var socket = io();
 socket.on("connect", function(){
-            var nRoom = "nRoom";
-            //socket.emit('nRoom', nRoom);
-            // storeUser({
-            //     name: socket.id, 
-            //     room: nRoom
-            // });
-            //var pRoom = "pRoom";
-            //socket.emit("pRoom", pRoom);
+    
         });
-        // NODE
+        // NODE room
         var nBtn = document.getElementById("nBtn");
         var n_leaveBtn = document.getElementById("n_leaveBtn");
         var n_joinBtn = document.getElementById("n_joinBtn");
@@ -53,9 +43,22 @@ socket.on("connect", function(){
         var nMessages = document.getElementById("nMessages");
         
         nBtn.addEventListener("click", function(){
+            storeEvent({
+                event: 'new message was added', 
+                room: 'nRoom',
+                user: socket.id,
+                timestamp: Date.now
+            });
             socket.emit("node new message", nTxt.value);
+            
         });
         n_leaveBtn.addEventListener("click", function(){
+            storeEvent({
+                event: 'user left nRoom', 
+                room: 'nRoom',
+                user: socket.id,
+                timestamp: Date.now
+            }); 
             socket.emit("node leave room");
         });
         n_joinBtn.addEventListener("click", function(){
@@ -65,6 +68,12 @@ socket.on("connect", function(){
                 name: socket.id, 
                 room: nRoom
             });
+            storeEvent({
+                event: 'new user entered nRoom', 
+                room: 'nRoom',
+                user: socket.id,
+                timestamp: Date.now
+            });
         });
         socket.on("node news", function(data){
             nMessages.innerHTML = nMessages.innerHTML + "<br>" + data;
@@ -72,34 +81,62 @@ socket.on("connect", function(){
         socket.on("node new user", function(data){
             nMessages.innerHTML = nMessages.innerHTML + "<br>" + data;
         });
-        // Python
+        // Python room
         var pBtn = document.getElementById("pBtn");
         var pTxt = document.getElementById("pTxt");
         var pMessages = document.getElementById("pMessages");
         pBtn.addEventListener("click", function(){
+            storeEvent({
+                event: 'new message was added', 
+                room: 'pRoom',
+                user: socket.id,
+                timestamp: Date.now
+            });
             socket.emit("python new message", pTxt.value);
+            
         });
         p_leaveBtn.addEventListener("click", function(){
+            storeEvent({
+                event: 'user left pRoom', 
+                room: 'pRoom',
+                user: socket.id,
+                timestamp: Date.now
+            });
             socket.emit("python leave room");
+            
         });
         p_joinBtn.addEventListener("click", function(){
             var pRoom = "pRoom";
             socket.emit('pRoom', pRoom);
             storeUser({
                 name: socket.id, 
-                room: pRoom
+                room: 'pRoom'
             });
+            storeEvent({
+                event: 'new user entered pRoom', 
+                room: 'pRoom',
+                user: socket.id
+            });
+            
         });
         socket.on("python news", function(data){
             pMessages.innerHTML = pMessages.innerHTML + "<br>" + data;
         });
+
         socket.on("python new user", function(data){
             pMessages.innerHTML = pMessages.innerHTML + "<br>" + data;
         });
 
         function storeUser(user){
             $.post('/users', user);
+            console.log(user);
         }
+
+        function storeEvent(event){
+            $.post('/events', event);
+        }
+
+        
 
 </script>
 </body>
